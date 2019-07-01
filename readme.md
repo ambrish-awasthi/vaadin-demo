@@ -1,0 +1,1 @@
+This project is a fully functional minimalist CRUD Application using vaddin framework and spring boot.
