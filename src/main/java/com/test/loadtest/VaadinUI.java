@@ -2,10 +2,13 @@ package com.test.loadtest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -19,13 +22,15 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.themes.ValoTheme;
 @SpringUI
+@Push()
 public class VaadinUI extends UI {
 @Autowired
 Service service;
-
+Grid<Players> grid;
+ListDataProvider<Players> ldp;
 HorizontalSplitPanel hsp;
 	@Override
-	protected void init(VaadinRequest request) {
+	protected void init(VaadinRequest request) { 
 		VerticalLayout vLayout1, vLayout2,vLayout3;
 		
 		HorizontalLayout hLayout1;
@@ -53,13 +58,20 @@ HorizontalSplitPanel hsp;
 	    	 
 	    	   service.addData(tf1.getValue(),tf2.getValue(),tf3.getValue());
 	    	   label2.setValue("Success");
+	    	  updateGrid();
 	     });
 	     vLayout2.addComponents(label2,tf1,tf2,tf3,button);
 	    //middle right
-	    Grid<Players> grid =  new Grid<Players>();
-	    ListDataProvider<Players> ldp  =  DataProvider.ofCollection(service.getData());
-	    grid.setDataProvider(ldp);
+	    grid =  new Grid<>(Players.class);
+	   
+	    updateGrid();
+	    grid.setWidth("90%");
+	    grid.setHeight("90%");
+	    grid.setColumnOrder("id","name","email");
 	    vLayout3.addComponent(grid);
+	    
+	    
+	    
 	    hsp = new HorizontalSplitPanel();
 	    hsp.addComponents(vLayout2,vLayout3);
 	    hsp.setSplitPosition(50);
@@ -72,6 +84,10 @@ HorizontalSplitPanel hsp;
 		vLayout1.setExpandRatio(hsp, 8);
 		vLayout1.setMargin(new MarginInfo(false,false,false,false));
 		setContent(vLayout1);
+		
+	}
+	private void updateGrid() {
+		grid.setDataProvider( DataProvider.ofCollection(service.getData()));
 		
 	}
 
